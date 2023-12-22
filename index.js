@@ -29,7 +29,13 @@ async function run() {
             const query = { email: req.query.email, status: 'Ongoing' };
             const result = await todoCollection.find(query).toArray();
             res.send(result)
-        })
+        });
+
+        app.get('/completed', async (req, res) => {
+            const query = { email: req.query.email, status: 'Completed' };
+            const result = await todoCollection.find(query).toArray();
+            res.send(result)
+        });
 
         app.post('/new-todo', async (req, res) => {
             const data = req.body;
