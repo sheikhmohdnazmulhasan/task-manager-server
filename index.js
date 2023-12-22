@@ -8,12 +8,6 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-app.post('/new-todo', (req, res) => {
-    const data = req.body;
-    console.log(data);
-});
-
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.lmbjtpv.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, { serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true } });
@@ -23,6 +17,15 @@ async function run() {
 
         await client.connect();
 
+        const todoCollection = client.db('todo').collection('todo');
+
+        app.
+
+        app.post('/new-todo', async (req, res) => {
+            const data = req.body;
+            const result = await todoCollection.insertOne(data);
+            res.send(result);
+        });
 
 
         await client.db("admin").command({ ping: 1 });
