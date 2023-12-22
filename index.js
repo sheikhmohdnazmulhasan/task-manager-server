@@ -19,7 +19,11 @@ async function run() {
 
         const todoCollection = client.db('todo').collection('todo');
 
-        app.
+        app.get('/todo', async (req, res) => {
+            const query = { email: req.query.email, status: 'Todo' }
+            const result = await todoCollection.find(query).toArray();
+            res.send(result)
+        })
 
         app.post('/new-todo', async (req, res) => {
             const data = req.body;
