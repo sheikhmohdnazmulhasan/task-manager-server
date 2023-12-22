@@ -25,7 +25,11 @@ async function run() {
             res.send(result)
         });
 
-
+        app.get('/ongoing', async (req, res) => {
+            const query = { email: req.query.email, status: 'Ongoing' };
+            const result = await todoCollection.find(query).toArray();
+            res.send(result)
+        })
 
         app.post('/new-todo', async (req, res) => {
             const data = req.body;
@@ -38,6 +42,17 @@ async function run() {
             const filter = { _id: new ObjectId(id) };
             const updatedDoc = {
                 $set: { status: 'Ongoing' }
+            };
+
+            const result = await todoCollection.updateOne(filter, updatedDoc);
+            res.send(result)
+        });
+
+        app.patch('/todo-completed', async (req, res) => {
+            const id = req.query.id;
+            const filter = { _id: new ObjectId(id) };
+            const updatedDoc = {
+                $set: { status: 'Completed' }
             };
 
             const result = await todoCollection.updateOne(filter, updatedDoc);
