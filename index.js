@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const app = express();
 const port = process.env.PORT || 5000;
@@ -23,12 +23,25 @@ async function run() {
             const query = { email: req.query.email, status: 'Todo' }
             const result = await todoCollection.find(query).toArray();
             res.send(result)
-        })
+        });
+
+
 
         app.post('/new-todo', async (req, res) => {
             const data = req.body;
             const result = await todoCollection.insertOne(data);
             res.send(result);
+        });
+
+        app.patch('/todo-ongoing', async (req, res) => {
+            const id = req.query.id;
+            const filter = { _id: new ObjectId(id) };
+            const updatedDoc = {
+                $set: { status: 'Ongoing' }
+            };
+
+            const result = await todoCollection.updateOne(filter, updatedDoc);
+            res.send(result)
         });
 
 
