@@ -15,14 +15,14 @@ const client = new MongoClient(uri, { serverApi: { version: ServerApiVersion.v1,
 async function run() {
     try {
 
-        await client.connect();
+        // await client.connect();
 
         const todoCollection = client.db('todo').collection('todo');
 
         app.get('/todo', async (req, res) => {
             const query = { email: req.query.email, status: 'Todo' }
             const result = await todoCollection.find(query).toArray();
-            res.send(result)
+            res.send(result);
         });
 
         app.get('/ongoing', async (req, res) => {
@@ -35,6 +35,13 @@ async function run() {
             const query = { email: req.query.email, status: 'Completed' };
             const result = await todoCollection.find(query).toArray();
             res.send(result)
+        });
+
+        app.get('/edit/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await todoCollection.findOne(query);
+            res.send(result);
         });
 
         app.post('/new-todo', async (req, res) => {
@@ -54,13 +61,6 @@ async function run() {
             res.send(result)
         });
 
-        app.delete('/delete', async (req, res) => {
-            const id = req.query.id;
-            const query = { _id: new ObjectId(id) };
-            const result = await todoCollection.deleteOne(query);
-            res.send(result);
-        });
-
         app.patch('/todo-completed', async (req, res) => {
             const id = req.query.id;
             const filter = { _id: new ObjectId(id) };
@@ -72,6 +72,28 @@ async function run() {
             res.send(result)
         });
 
+        app.patch('/update', async (req, res) => {
+            const id = req.query.id;
+            const filter = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    title: req.body.title,
+                    descriptions: req.body.descriptions,
+                    dateline: req.body.dateline,
+                    priority: req.body.priority
+                }
+            };
+
+            const result = await todoCollection.updateOne(filter, updatedDoc);
+            res.send(result);
+        });
+
+        app.delete('/delete', async (req, res) => {
+            const id = req.query.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await todoCollection.deleteOne(query);
+            res.send(result);
+        });
 
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
